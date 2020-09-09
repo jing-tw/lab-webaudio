@@ -1,5 +1,8 @@
 
 'use strict';
+
+// This code was modified from https://stackoverflow.com/questions/32721311/koa-js-serving-static-files-and-rest-api
+
 import * as Koa from "koa";
 import * as send from 'koa-send';
 import * as Router from "koa-router";

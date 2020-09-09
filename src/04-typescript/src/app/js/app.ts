@@ -1,3 +1,5 @@
+// This code was taken from the video tutorial, https://www.youtube.com/watch?v=H1lgYojMCaQ&feature=youtu.be&ab_channel=SimplyExplained&t=254s
+
 class SimpleCounter{
     public count(){
         let count = 5;
