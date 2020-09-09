@@ -1,4 +1,4 @@
-# Detail Document #
+# Document #
 http://mqjing.blogspot.com/2020/09/typescript-koa-vscode-how-to-debug.html
 
 # Start Server #
