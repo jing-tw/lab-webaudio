@@ -10,7 +10,7 @@ let app = new Koa();
 let router = new Router();
 
 // serve files in public folder (css, js etc)
-app.use(serve(__dirname + '/public'));  // http://localhost:3000/index.html
+app.use(serve(__dirname + '/app'));  // http://localhost:3000/index.html
 
 // rest endpoints
 router.get('/api/whatever', function *(){
@@ -30,7 +30,7 @@ app.use(router.routes());
 //   yield send(this, '/error.html');
 // });
 
-console.log('Starting up http-server, serving ./public/');
+console.log('Starting up http-server, serving ./app/');
 console.log('Available on:');
 console.log('\thttp://localhost:3000\n\n');
 console.log('Hit CTRL-C to stop the server');
