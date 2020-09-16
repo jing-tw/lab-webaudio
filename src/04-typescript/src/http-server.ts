@@ -33,8 +33,9 @@ app.use(router.routes());
 //   yield send(this, '/error.html');
 // });
 
+let intPort:number = 3001;
 console.log('Starting up http-server, serving ./app/');
 console.log('Available on:');
-console.log('\thttp://localhost:3000\n\n');
+console.log('\thttp://localhost:', intPort + '\n\n');
 console.log('Hit CTRL-C to stop the server');
-app.listen(3000);
+app.listen(intPort);
