@@ -1,0 +1,12 @@
+{
+  "name": "05-play-raw-in-memory",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT", 
+
+  "scripts": {
+    "build": "tsc",
+    "run": "gio open ./src/index.html",
+    "clean": "find . -name \"*.js\" -type f|xargs rm -f"
+  }
+}
