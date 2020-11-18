@@ -1,11 +1,18 @@
 class PlayAudioStream {
     private static readonly strDATA_SOURCE:string = 'sin'; // 'random'
     private static readonly numSAMLING_RATE:number = 4000; //44100;
+    private readonly numChunkSizeInSec:number = 0.1;
     private __audioCtx:any;
-    private __numStartAt:number;
 
+    private __numStartAt:number; // for webaudio play time index
+    private __time:number;   // for sin wave generate
+    private __lastTimeoutTime:number; // for caucuating the the processing duration
+    
     constructor(){
         this.__numStartAt = 0;
+        this.__time = 0;
+
+        this.__lastTimeoutTime = 0;
     }
 
     public render(){
@@ -20,30 +27,42 @@ class PlayAudioStream {
                 latencyHint: 'interactive', //try to use the lowest possible and reliable latency it can
                 sampleRate: PlayAudioStream.numSAMLING_RATE,
               });
-            this.__nextFrame();  //simulate the streaming call back
+            // this.__nextFrame();  //simulate the streaming call back
+            setTimeout(this.__nextFrame.bind(this), 0);
         });
     }
 
     private __nextFrame(){
         let myData:Float32Array;
-        switch(PlayAudioStream.strDATA_SOURCE){
-            case 'sin':
-                myData = this.__genSinData();
-                break;
-            case 'random':
-                myData = this.__genRandomData();
-                break;
-            default:
-                console.error('[__nextFrame] Unknown DATA_SOURCE, strDATA_SOURCE = ' + PlayAudioStream.strDATA_SOURCE + ' Act: Stop render audio');
-                return;
-        }
+        myData = this.__getAudioData(this.numChunkSizeInSec);
         this.__playAudio(myData);
-        // console.log('next');
-        setTimeout(this.__nextFrame.bind(this));
+
+        // schedule the next chunk to play
+        const numCurChunkDurInMs:number = myData.length * 1000 /PlayAudioStream.numSAMLING_RATE;
+        let nextTimeoutDuration:number = numCurChunkDurInMs - (performance.now() - this.__lastTimeoutTime); // schedule time = current chunk duration - processing duration
+        this.__lastTimeoutTime = performance.now();
+        setTimeout(this.__nextFrame.bind(this), nextTimeoutDuration);
+        console.log('next, len = ' + myData.length + ' dur = ' + numCurChunkDurInMs + '(in ms)' + ' nextTimeoutDuration = ' + nextTimeoutDuration + ' (in ms)');
     }
 
-    private __genRandomData():Float32Array{
-        let length:number = PlayAudioStream.numSAMLING_RATE;
+    private __getAudioData(numSec:number):Float32Array{
+        let myData:Float32Array;
+        switch(PlayAudioStream.strDATA_SOURCE){
+            case 'sin':
+                myData = this.__genSinData(numSec);
+                break;
+            case 'random':
+                myData = this.__genRandomData(numSec);
+                break;
+            default:
+                console.error('[__nextFrame] Unknown DATA_SOURCE, strDATA_SOURCE = ' + PlayAudioStream.strDATA_SOURCE + ' Act: return a data with zero');
+                return Float32Array.from([0]);
+        }
+        return myData;
+    }
+
+    private __genRandomData(numSec:number):Float32Array{
+        let length:number = PlayAudioStream.numSAMLING_RATE * numSec;
         let floatRawArray:Float32Array = new Float32Array(length);
 
         for(let i = 0; i<length; i++){
@@ -53,30 +72,30 @@ class PlayAudioStream {
         return floatRawArray;
     }
 
-    private __genSinData():Float32Array{
-        let length:number = PlayAudioStream.numSAMLING_RATE;
-        const frequency = 1000;
+    private __genSinData(numSec:number):Float32Array{
+        let length:number = PlayAudioStream.numSAMLING_RATE * numSec;
+        const frequency = 300; //1000;
         let floatRawArray:Float32Array = new Float32Array(length);
         const secondsPerSample = 1 / PlayAudioStream.numSAMLING_RATE;
         const twoPi = 2 * Math.PI;
 
-        let time = 0;
-        for(let i = 0; i<length; i++, time += secondsPerSample){
-            floatRawArray[i] = Math.sin(twoPi * frequency * time) * 1.0; 
+        
+        for(let i = 0; i<length; i++, this.__time += secondsPerSample){
+            floatRawArray[i] = Math.sin(twoPi * frequency * this.__time) * 1.0; 
         }
+
+        // let time:number = 0;
+        // for(let i = 0; i<length; i++, time += secondsPerSample){
+        //     floatRawArray[i] = Math.sin(twoPi * frequency * time) * 1.0; 
+        // }
 
         return floatRawArray;
     }
 
     private __genAudioBuffer(floatRawArray:Float32Array):AudioBuffer{
-        // console.log('1 this.__audioCtx.sampleRate = ', this.__audioCtx.sampleRate);
         let myAudioBuffer:AudioBuffer = this.__audioCtx.createBuffer(2, floatRawArray.length, this.__audioCtx.sampleRate);
-        for (var channel = 0; channel < myAudioBuffer.numberOfChannels; channel++) {
-            var nowBuffering = myAudioBuffer.getChannelData(channel);
-            for (var i = 0; i < myAudioBuffer.length; i++) {
-                nowBuffering[i] = floatRawArray[i];
-            }
-        }
+        myAudioBuffer.copyToChannel(floatRawArray, 0, 0);
+        myAudioBuffer.copyToChannel(floatRawArray, 1, 0);
         return myAudioBuffer;
     }
 
@@ -88,6 +107,7 @@ class PlayAudioStream {
         source.connect(this.__audioCtx.destination);
         source.start(this.__numStartAt);
         this.__numStartAt = this.__numStartAt + myAudioBuffer.duration;
+        console.log('play audio, this.__numStartAt = ' + this.__numStartAt + ' dur = ', myAudioBuffer.duration + ' (secs).');
     }
 }
 
