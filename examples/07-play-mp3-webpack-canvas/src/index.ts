@@ -8,6 +8,12 @@ class Test{
     buffer:AudioBuffer | null;
     source:AudioBufferSourceNode | null;
 
+    strStatusPlay:string = 'Play';
+    strStatusPlaying:string = 'Playing';
+
+    strBtPlayId:string = 'strBtPlayId';
+    strBtStopId:string = 'strBtStopId';
+
     constructor() {
         this.context = null;
         this.buffer = null;
@@ -54,7 +60,7 @@ class Test{
     }
 
     _initBtPlay(){
-        this._initBtComm('Play', async () => {
+        this._initBtComm('Play', this.strBtPlayId, async () => {
             console.log('this.constructor.name = ', this.constructor.name); // Test
             console.log('clicked');
             this._initAudioContext();
@@ -63,22 +69,44 @@ class Test{
             if(!bok){
                 console.log(strMsg);
             }
+
+            let btPlay:HTMLElement|null = document.getElementById(this.strBtPlayId);
+            if(btPlay === null){
+                console.log('[Error] _initBtPlay:: btPlay === null');
+                return;
+            }
+
+            if (btPlay.innerText == this.strStatusPlay){
+                btPlay.innerText = this.strStatusPlaying;
+            }
+
         });
     }
 
     _initBtStop(){
-        this._initBtComm('Stop', () => {
+        this._initBtComm('Stop', this.strBtStopId, () => {
             this._uiSoundStop();
+
+            let btPlay:HTMLElement|null = document.getElementById(this.strBtPlayId);
+            if(btPlay === null){
+                console.log('[Error] _initBtPlay:: btPlay === null');
+                return;
+            }
+
+            if (btPlay.innerText == this.strStatusPlaying){
+                btPlay.innerText = this.strStatusPlay;
+            }
         });
     }
 
-    _initBtComm(strTitle:string, listener:any) {
-        let button = document.createElement('button');
-        button.innerHTML = strTitle;  // set the button content
-        button.addEventListener('click', listener);
+    _initBtComm(strTitle:string, strID:string, listener:any) {
+        let btCommon:HTMLElement = document.createElement('button');
+        btCommon.setAttribute("id", strID);
+        btCommon.innerHTML = strTitle;  // set the button content
+        btCommon.addEventListener('click', listener);
 
         var body = document.getElementsByTagName("body")[0];
-        body.appendChild(button);
+        body.appendChild(btCommon);
     }
 
     _initAudioContext() {
