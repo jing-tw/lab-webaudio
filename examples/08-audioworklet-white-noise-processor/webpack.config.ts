@@ -13,24 +13,12 @@ const config: webpack.Configuration = {
     	    filename: 'main.bundle.js'     // <------------- setup bundle  file
 	},
 
-    plugins: [
-        new HtmlWebpackPlugin({
-            template: 'src/index.html'
-          }),
-
-		  new CopyPlugin({
-			patterns: [
-			  { from: path.resolve(__dirname, 'src') + path.sep + 'white-noise-processor.js', to: path.resolve(__dirname, 'dist')},
-			],
-		  })
-    ],
-
 	// file resolutions
 	resolve: {
     	    extensions: [ '.ts', '.js' ],
     },
 
-	// loaders
+	// ts-loader will enter through ./index.ts, load all .ts and .tsx files
 	module: {
     	    rules: [
         	        {
@@ -40,6 +28,20 @@ const config: webpack.Configuration = {
         	       }
     	    ]
 	},
+
+	// for template index and copy specific file
+	plugins: [
+        new HtmlWebpackPlugin({
+            template: 'src/index.html'
+          }),
+
+		  new CopyPlugin({
+			patterns: [
+			  // { from: path.resolve(__dirname, 'src') + path.sep + 'white-noise-processor.js', to: path.resolve(__dirname, 'dist')},
+			  { from: path.resolve(__dirname, 'src', 'audioworklets', 'white-noise-processor.js'), to: path.resolve(__dirname, 'dist')},
+			],
+		  })
+    ],
 
 	// for webpack-dev-server
 	devtool: "source-map",  // <---- Enable sourcemaps for debugging webpack's output.

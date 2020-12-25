@@ -156,13 +156,42 @@
 // test.initUI();
 
 
-const foo = async () => {
-    const audioContext = new AudioContext()
-    await audioContext.audioWorklet.addModule('white-noise-processor.js')
-    // do smt with bar
-    const whiteNoiseNode = new AudioWorkletNode(audioContext, 'white-noise-processor')
-    whiteNoiseNode.connect(audioContext.destination)
-  };
+// const foo = async () => {
+//     const audioContext = new AudioContext()
+//     await audioContext.audioWorklet.addModule('white-noise-processor.js')
+//     // do smt with bar
+//     const whiteNoiseNode = new AudioWorkletNode(audioContext, 'white-noise-processor')
+//     whiteNoiseNode.connect(audioContext.destination)
+//   };
+
+// foo()
+
+class TestWhiteNoiseProcessor{
+  constructor(){
+  }
+
+  initButton2() {
+     this.initButton('Play', 'numBtPlayId', async () => {
+      //foo();
+        const audioContext = new AudioContext()
+        await audioContext.audioWorklet.addModule('white-noise-processor.js')
+        // do smt with bar
+        const whiteNoiseNode = new AudioWorkletNode(audioContext, 'white-noise-processor')
+        whiteNoiseNode.connect(audioContext.destination)
+      });
+  }
+
+  initButton(strTitle:string, strID:string, listener:any) {
+    let btCommon:HTMLElement = document.createElement('button');
+    btCommon.setAttribute("id", strID);
+    btCommon.innerHTML = strTitle;  // set the button content
+    btCommon.addEventListener('click', listener);
+
+    var body = document.getElementsByTagName("body")[0];
+    body.appendChild(btCommon);
+  }
+}
 
 
-foo();
+let obj:TestWhiteNoiseProcessor = new TestWhiteNoiseProcessor();
+obj.initButton2();
