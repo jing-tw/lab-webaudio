@@ -155,31 +155,10 @@
 // var test = new Test();
 // test.initUI();
 
+'use strict';
+import Scope from './Scope';
 
-// const foo = async () => {
-//     const audioContext = new AudioContext()
-//     await audioContext.audioWorklet.addModule('white-noise-processor.js')
-//     // do smt with bar
-//     const whiteNoiseNode = new AudioWorkletNode(audioContext, 'white-noise-processor')
-//     whiteNoiseNode.connect(audioContext.destination)
-//   };
-
-// foo()
-
-class TestWhiteNoiseProcessor{
-  constructor(){
-  }
-
-  initButton2() {
-     this.initButton('Play', 'numBtPlayId', async () => {
-      //foo();
-        const audioContext = new AudioContext()
-        await audioContext.audioWorklet.addModule('white-noise-processor.js')
-        // do smt with bar
-        const whiteNoiseNode = new AudioWorkletNode(audioContext, 'white-noise-processor')
-        whiteNoiseNode.connect(audioContext.destination)
-      });
-  }
+class Test_WhiteNoiseProcessor{
 
   initButton(strTitle:string, strID:string, listener:any) {
     let btCommon:HTMLElement = document.createElement('button');
@@ -190,8 +169,23 @@ class TestWhiteNoiseProcessor{
     var body = document.getElementsByTagName("body")[0];
     body.appendChild(btCommon);
   }
+
+  run() {
+    this.initButton('Play', 'numBtPlayId', async () => {
+      const audioContext = new AudioContext();
+      await audioContext.audioWorklet.addModule('white-noise-processor.js');
+      let whiteNoiseNode:AudioWorkletNode = new AudioWorkletNode(audioContext, 'white-noise-processor');
+
+      // show wave
+      let canvas = document.querySelector('canvas');
+      let displayScope:Scope = new Scope(audioContext, canvas); // create oscilloscope device for display audiosource on canvas
+      whiteNoiseNode.connect(displayScope.input); // [osc source] -> [the display intput]
+      displayScope.start();
+      // end
+      whiteNoiseNode.connect(audioContext.destination)
+    });
+ }
 }
 
-
-let obj:TestWhiteNoiseProcessor = new TestWhiteNoiseProcessor();
-obj.initButton2();
+let tester:Test_WhiteNoiseProcessor = new Test_WhiteNoiseProcessor();
+tester.run();
