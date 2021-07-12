@@ -2,6 +2,7 @@
 
 import { RuleTester } from "eslint";
 import Scope from './Scope';
+import FrequencyBar from './FrequencyBar'
 
 class Test{
     context:AudioContext | null;
@@ -21,11 +22,11 @@ class Test{
     }
 
     initUI(){
-        this._initBtPlay();
-        this._initBtStop();
+        this.addPlayButton();
+        this.addStopButton();
     }
 
-    _uiSoundPlay(buffer:AudioBuffer):{bok:boolean, strMsg:string} {
+    Play(buffer:AudioBuffer):{bok:boolean, strMsg:string} {
         if (buffer === null){
             return {bok:false, strMsg:'buffer === null'};
         }
@@ -38,11 +39,18 @@ class Test{
         }
         this.source.buffer = this.buffer;
 
-        // test
-        let canvas = document.querySelector('canvas');
-        let displayScope:Scope = new Scope(this.context, canvas); // create oscilloscope device for display audiosource on canvas
-        this.source.connect(displayScope.input); // [osc source] -> [the display intput]
-        displayScope.start();
+        // show frequency bar on canvas_1
+        let canvas_1 = document.getElementById('canvas_1');
+        let displayFrequencyBar:FrequencyBar = new FrequencyBar(this.context, canvas_1);
+        this.source.connect(displayFrequencyBar.input); // [osc source] -> [the display intput]
+        displayFrequencyBar.start();
+
+
+         // show wave on canvase_2
+         let canvas_2 = document.getElementById('canvas_2');
+         let displayScope:Scope = new Scope(this.context, canvas_2); // create oscilloscope device for display audiosource on canvas
+         this.source.connect(displayScope.input); // [osc source] -> [the display intput]
+         displayScope.start();
         // end of test
         
         this.source.connect(this.context.destination);
@@ -51,7 +59,8 @@ class Test{
         return {bok:true, strMsg: 'ok'};
     }
 
-    _uiSoundStop() {
+
+    Stop() {
         if (this.source != null) {
             this.source.stop();
         }else{
@@ -59,13 +68,13 @@ class Test{
         }
     }
 
-    _initBtPlay(){
+    addPlayButton(){
         this._initBtComm('Play', this.strBtPlayId, async () => {
             console.log('this.constructor.name = ', this.constructor.name); // Test
             console.log('clicked');
             this._initAudioContext();
             this.buffer = await this._loadAudioBuffer("https://archive.org/download/100ClassicalMusicMasterpieces/1685%20Purcell%20,%20Trumpet%20Tune%20and%20Air.mp3");
-            const {bok, strMsg} = this._uiSoundPlay(this.buffer);
+            const {bok, strMsg} = this.Play(this.buffer);
             if(!bok){
                 console.log(strMsg);
             }
@@ -83,9 +92,9 @@ class Test{
         });
     }
 
-    _initBtStop(){
+    addStopButton(){
         this._initBtComm('Stop', this.strBtStopId, () => {
-            this._uiSoundStop();
+            this.Stop();
 
             let btPlay:HTMLElement|null = document.getElementById(this.strBtPlayId);
             if(btPlay === null){
