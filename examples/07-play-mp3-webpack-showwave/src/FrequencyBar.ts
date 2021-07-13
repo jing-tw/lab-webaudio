@@ -83,10 +83,29 @@ export default class FrequencyBar {
         let barHeight;
         let x = 0;
 
+        // let max = Math.max.apply(this.freqData);
+        let max = this.freqData.reduce((a, b) => { return Math.max(a, b) });
+
+        let y = 0, r = 0;
         for(i = 0; i < this.freqData.length; i++) {
             barHeight = this.freqData[i];
-            this.ctx.fillStyle = 'rgb(' + (barHeight+100) + ', 50, 50)';
-            this.ctx.fillRect(x, this.height - barHeight/2, barWidth, barHeight);
+            // this.ctx.fillStyle = 'rgb(' + (barHeight+100) + ',' + (barHeight+150) + ',' + (barHeight+100) + ')';
+            // this.ctx.fillRect(x, this.height - barHeight/2, barWidth, barHeight);
+            
+            r = barHeight / max;
+            y = r * this.height;
+            
+            if (r > 0.8)
+                this.ctx.fillStyle = 'rgb(' + (barHeight+150) + ',' + (50) + ',' + (50) + ')';
+
+            if (r > 0.5 && r <= 0.8)
+                this.ctx.fillStyle = 'rgb(' + (50) + ',' + (barHeight + 150) + ',' + (50) + ')';
+
+            if (r <= 0.5)
+                this.ctx.fillStyle = 'rgb(' + (barHeight+100) + ',' + (barHeight+100) + ',' + (barHeight+100) + ')';
+
+            this.ctx.fillRect(x, this.height - y-1, barWidth, y);
+
             x += barWidth + 1;
         }
 
