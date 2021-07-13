@@ -9,24 +9,24 @@ const config: webpack.Configuration = {
 
 	// output bundle
 	output: {
-    	    path: path.resolve(__dirname, 'dist'),      // <------- bundles location
-    	    filename: 'main.bundle.js'     // <------------- setup bundle  file
+		path: path.resolve(__dirname, 'dist'),      // <------- bundles location
+		filename: 'main.bundle.js'     // <------------- setup bundle  file
 	},
 
 	// file resolutions
 	resolve: {
-    	    extensions: [ '.ts', '.js' ],
+    	extensions: [ '.ts', '.js' ],
     },
 
 	// ts-loader will enter through ./index.ts, load all .ts and .tsx files
 	module: {
-    	    rules: [
-        	        {
-            	            test: /\.tsx?/,
-            	            use: 'ts-loader',
-            	            exclude: /node_modules/,
-        	       }
-    	    ]
+		rules: [
+			{
+				test: /\.tsx?/,
+				use: 'ts-loader',
+				exclude: /node_modules/,
+			}
+		]
 	},
 
 	// for template index and copy specific file
@@ -37,7 +37,6 @@ const config: webpack.Configuration = {
 
 		  new CopyPlugin({
 			patterns: [
-			  // { from: path.resolve(__dirname, 'src') + path.sep + 'white-noise-processor.js', to: path.resolve(__dirname, 'dist')},
 			  { from: path.resolve(__dirname, 'src', 'audioworklets', 'white-noise-processor.js'), to: path.resolve(__dirname, 'dist')},
 			],
 		  })

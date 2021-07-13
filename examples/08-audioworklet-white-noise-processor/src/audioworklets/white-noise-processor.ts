@@ -31,8 +31,6 @@ class WhiteNoiseProcessor extends AudioWorkletProcessor {
       })
       return true;
     }
-  
   }
-  
+
   registerProcessor('white-noise-processor', WhiteNoiseProcessor);
-  
